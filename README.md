@@ -12,5 +12,6 @@ An engulfing candlestick is defined as:
 - The length of the current candle is longer than its previous candle
 - The range of previous open to close prices is within the range of current open to close prices
 - The direction of the candles are in opposite direction
-We will also define the apparent strength of the candle as the difference of the open and close price ranges of previous and current candles.
+
+We will also define the apparent strength of the candle as the difference of the open and close price ranges of previous and current candles divided by the open and close price ranges of the current candle. We define it this way so that the value of strength is between 0 and 1.
 Let's take a bullish candlestick as an example:
