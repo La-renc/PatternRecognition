@@ -97,7 +97,7 @@ Next, let's grid search a few different lengths of future days and see what woul
 |13        |     0.2467|    -0.3430|
 |14        |     0.2337|    -0.3360|
 
-From the result, the correlation of bullish engulf candles are better as the days get shorter, which means that it works better in shorter term. For bearish engulf candles it gets slightly worst in shorter term. It seems the sweet spot is around 9 days.
+From the result, the correlation of bullish engulf candles are better as the days get shorter, which means that it works better in shorter term. For bearish engulf candles it gets slightly worst in shorter term. It seems the sweet spot is around 9 days. In all the length of days, the bullish shows a positive correlation to future trend and bearish shows negative, which is as we would expected it to be. However the correlation value is quite low (mostly around 0.3)
 
 
 
