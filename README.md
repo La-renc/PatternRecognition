@@ -46,6 +46,43 @@ df['bearish_engulf'] = df[['bull_candle_t-1','bear_candle','c<co_t-1','o>co_t-1'
 
 Display the candlestick chart with the function draw_candles.
 ```
+def draw_candles(df=pd.DataFrame):
+    fig = plt.figure(figsize=(18,9))
+    ax_ohlc = fig.add_subplot(9,1,(1,7))
+    ax_vol = fig.add_subplot(9,1,9,sharex=ax_ohlc)
+    fig.suptitle('Engulfing candlesticks', fontsize=16)
+    dates = [idx.strftime('%Y-%m-%d') for idx in df.index]
+    locs = []
+    for i in range(1,len(df.index)):
+        if df.index[i-1].month != df.index[i].month:
+            locs.append(i)
+    candle_colors=[]
+    for j in df['close']-df['open']:
+        if j>0: candle_colors.append('green')
+        elif j==0: candle_colors.append('black')
+        else: candle_colors.append('red')
+    ax_ohlc.bar(dates, df['high']-df['low'], bottom=df['low'], width=0.3, color='black')
+    ax_ohlc.bar(dates, df['close']-df['open'], bottom=df['open'], width=0.9, color=candle_colors)
+    ax_ohlc.bar([d.strftime('%Y-%m-%d') for d in df[df['close']-df['open']==0].index], [0.01 for _ in range(sum(df['close']-df['open']==0))], bottom=df['open'].loc[df['close']-df['open']==0], width=0.9, color=candle_colors)
+    list_bull_eng=[idx.strftime('%Y-%m-%d') for idx in df.index[df['bullish_engulf']]]
+    ax_ohlc.scatter(list_bull_eng, 0.98*df['low'][df['bullish_engulf']], label='bullish_engulf', color='g', marker='^')
+    list_bear_eng=[idx.strftime('%Y-%m-%d') for idx in df.index[df['bearish_engulf']]]
+    ax_ohlc.scatter(list_bear_eng, 0.98*df['low'][df['bearish_engulf']], label='bearish_engulf', color='r', marker='v')
+    
+    ax_ohlc.xaxis.set_major_locator(mticker.FixedLocator(locs, nbins=None))
+    ax_ohlc.set_ylim(bottom=0.97*df['low'].min(), top=1.03*df['high'].max())
+    ax_ohlc.yaxis.set_ticks_position(position='right')
+    ax_ohlc.grid(visible=True)#, which='major')
+    ax_ohlc.legend()
+    ax_vol.bar(dates, df['volume'], width=0.9, color=candle_colors)
+    ax_vol.grid(visible=True)#, which='major')
+    plt.setp(ax_ohlc.get_xticklabels(), rotation=45)
+    plt.setp(ax_vol.get_xticklabels(), rotation=45)
+    plt.show()
+    print('\nBullish engulf dates:')
+    for idx in df.index[df['bullish_engulf']]: print(idx)
+    print('\nBearlish engulf dates:')
+    for idx in df.index[df['bearish_engulf']]: print(idx)
 
 ```
 
