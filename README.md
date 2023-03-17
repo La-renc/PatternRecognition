@@ -46,7 +46,7 @@ df['bearish_engulf'] = df[['bull_candle_t-1','bear_candle','c<co_t-1','o>co_t-1'
 
 Display the candlestick chart with the function draw_candles.
 ```
-
+draw_candles(df)
 ```
 
 The bullish and bearish engulf candles are marked with green and red triangle respectively.
@@ -74,9 +74,8 @@ If the mean future prices is higher than the current close price, the trend is p
 
 Next we see if there is any correlation between the occurence of engulfing candles and future price trend. We do so by plotting correlation graph using function draw_corr:
 ```
-
+draw_corr(df, 'engulf_pct', 'trend')
 ```
-
 ![patternrecognitioncorr](https://user-images.githubusercontent.com/125923909/225984338-c275a1e8-0903-4049-9786-caf0b6e806d4.png)
 The result shows that the correlation between the engulfing candles and future mean price is quite low, only 0.2337 and -0.3360. Especially for the bullish gulfing candles, even they occured, the future mean prices are mostly below the current close prices.
 
@@ -97,9 +96,44 @@ Next, let's grid search a few different lengths of future days and see what woul
 |13        |     0.2467|    -0.3430|
 |14        |     0.2337|    -0.3360|
 
-From the result, the correlation of bullish engulf candles are better as the days get shorter, which means that it works better in shorter term. For bearish engulf candles it gets slightly worst in shorter term. It seems the sweet spot is around 9 days. In all the length of days, the bullish shows a positive correlation to future trend and bearish shows negative, which is as we would expected it to be. However the correlation value is quite low (mostly around 0.3)
+From the result, the correlation of bullish engulf candles are better as the days get shorter, which means that it works better in shorter term. For bearish engulf candles it gets slightly worse in shorter term. It seems the sweet spot is around 9 days. In all the length of days, the bullish shows a positive correlation to future trend and bearish shows negative, which is as we would expected them to be. However the correlation values are quite low (mostly around 0.3)
 
+It is also believed that if the volume of the candle is greater, the bullishness or bearishness is also greater. Let's define volume change by comparing the current volume with previous volume. If current volume is greater than previous then the value is >1, and vice versa. Then multiply it with the engulf percentage.
 
+```
+#----Setup parameters to measure how bullish/bearish the engulfing candlesticks appear to be
+mask = df[['bullish_engulf','bearish_engulf']].any(axis=1)
+df['candle_len'] = abs(df['c-o'])
+df['candle_len_t-1'] = df['candle_len'].shift(1)
+df['engulf_pct'] = 1 - df['candle_len_t-1'][mask]/df['candle_len'][mask]
+df['v_pct'] = df['volume']/df['volume'].shift(1)
+df['engulfxvol'] = df['engulf_pct'][mask]*df['v_pct'][mask]
+```
+
+Grid search again with feature changed to 'engulfxvol'.
+```
+draw_corr(df, 'engulfxvol', 'trend')
+```
+
+| Days     | Bull Corr | Bear Corr |
+|----------|-----------|-----------|
+|3         |     0.3671|    -0.6610|
+|4         |     0.4063|    -0.7514|
+|5         |     0.3845|    -0.7386|
+|6         |     0.3759|    -0.7281|
+|7         |     0.3623|    -0.7061|
+|8         |     0.3343|    -0.7253|
+|9         |     0.2918|    -0.7182|
+|10        |     0.2266|    -0.6822|
+|11        |     0.1863|    -0.6661|
+|12        |     0.1463|    -0.6485|
+|13        |     0.1344|    -0.6499|
+|14        |     0.1424|    -0.6436|
+
+The result shows that the bearish engulfing candle correlates much better after multiplying the volume change. However the correlation on the bullish side got worse. This would suggested that the overall trend of the stock during this period of time is bearish (as we can see on the candlestick chart).
+The result also shows that both correlations get better as the length of future days are shorter, suggesting that it has a very short term effect.
+
+From the experiment above, we can see that an occurence of an engulfing candlestick alone is not a good indication of future price trend. It might be useful when using it together with some other technical indicators for price trend prediction.
 
 
 
