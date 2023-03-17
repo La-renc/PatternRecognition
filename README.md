@@ -111,7 +111,7 @@ If the mean future prices is higher than the current close price, the trend is p
 
 Next we see if there is any correlation between the occurence of engulfing candles and future price trend. We do so by plotting correlation graph using function draw_corr:
 ```
-def draw_corr(featurex=str, featurey=str):
+def draw_corr(df=pd.DataFrame, featurex=str, featurey=str):
     global future_window
     bull = df['bullish_engulf']
     bear = df['bearish_engulf']
